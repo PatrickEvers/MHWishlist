@@ -1,0 +1,21 @@
+#DeleteBtn{
+    margin-left: 100px;
+    border:none;
+    background-color: red;
+}
+
+#DeleteBtn:hover{
+    background-color: crimson;
+}
+
+li{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#main-list li input{
+    width:40px;
+    height:20px;
+    margin:0;
+}
