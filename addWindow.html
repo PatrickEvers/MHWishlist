@@ -9,10 +9,10 @@
     <form>
       <div>
         <label>Enter Item</label>
-        <input type="text" id="item" autofocus required>
+        <select name="items" id="item" style="display:block"></select>
         <br>
         <label>Amount</label>
-        <input type="number" id="amount" required value="1" min="1">
+        <input type="number" id="amount" required value="1" min="1">   
       </div>
       <button class="waves-effect waves-light btn" type="submit">Add Item</button>
     </form>
@@ -20,6 +20,17 @@
         <script>
             const electron = require('electron');
             const {ipcRenderer} = electron;
+            const fs = require('fs');
+
+            var itemFile = fs.readFileSync('items.txt').toString().split('\n');
+            const select = document.getElementById('item');
+            for(var i = 0; i < itemFile.length; i++)
+            {
+              const option = document.createElement('option');
+              option.value = itemFile[i];
+              option.textContent = itemFile[i];
+              select.appendChild(option);
+            }
 
             const form = document.querySelector('form');
             addEventListener('submit', submitForm);
