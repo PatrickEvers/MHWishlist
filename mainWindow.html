@@ -21,7 +21,6 @@
             const readline = require('readline');
             
             const ul = document.querySelector('ul');
-            
 
             var appStart = true;
 
@@ -35,7 +34,7 @@
                 addItemToList(list[i].substring(0,list[i].lastIndexOf(' x')),list[i].substring(list[i].lastIndexOf(' x')+2), appStart);
               }
             }
-            appStart = false;           
+            appStart = false;
 
             //Funktion zum Empfangen der Daten aus dem addWindow
             //Erstellt neues li mit Inhalt aus dem Formular
@@ -80,11 +79,14 @@
                   input.oldvalue = input.value;
                 })
                 input.addEventListener('change', () =>{
-                  var oldContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.oldvalue;
-                  var newContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.value;
-
-                  updateEntry(oldContent,newContent);
-                })                  
+                  var timeout = null;
+                  clearTimeout(timeout);
+                  timeout = setTimeout(function () {
+                    var oldContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.oldvalue;
+                    var newContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.value;
+                    updateEntry(oldContent,newContent);
+                  },750);
+                })
                 
                 //Wenn noch kein Eintrag für das Item vorhanden ist, füge es neu hinzu
                 if(document.getElementById(li.id) == null){
