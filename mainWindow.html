@@ -21,7 +21,7 @@
             const readline = require('readline');
             
             const ul = document.querySelector('ul');
-            ul.className = 'collection';
+            
 
             var appStart = true;
 
@@ -29,6 +29,9 @@
             var list = fs.readFileSync('List.txt', 'utf8').toString().split('\n');
             for(var i = 0; i < list.length; i++){
               if(list[i] != ""){
+                if(ul.className = ""){
+                  ul.className = 'collection';
+                }
                 addItemToList(list[i].substring(0,list[i].lastIndexOf(' x')),list[i].substring(list[i].lastIndexOf(' x')+2), appStart);
               }
             }
@@ -61,15 +64,9 @@
                   var fileContent = fs.readFileSync('List.txt').toString();
                   var line = document.getElementById(li.id).textContent.replace('Delete','') + input.value;
                   
-                  /*var listLength = document.getElementById('main-list').getElementsByTagName('li').length;
-                  if(listLength == 1){
-                    fsasync.writeFile('List.txt','','utf8');
-                  }
-                  else{*/
-                    fileContent = fileContent.replace('\n','');
-                    fileContent = fileContent.replace(line,'');
-                    fsasync.writeFile('List.txt',fileContent,'utf8');
-                  //}
+                  fileContent = fileContent.replace('\n','');
+                  fileContent = fileContent.replace(line,'');
+                  fsasync.writeFile('List.txt',fileContent,'utf8');
 
                   deleteBtn.parentElement.remove();
                   if(ul.children.length == 0){
@@ -86,16 +83,7 @@
                   var oldContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.oldvalue;
                   var newContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.value;
 
-                  //Ersetzen des vorhanden Eintrags, damit die Anzahl aktuell ist
-                  fs.readFile('List.txt', 'utf8', function (err,data) {
-                    if (err) {
-                      return console.log(err);
-                    }
-                    var result = data.replace(oldContent, newContent);
-                    fs.writeFile('List.txt', result, 'utf8', function (err) {
-                      if (err) return console.log(err);
-                    });
-                  });
+                  updateEntry(oldContent,newContent);
                 })                  
                 
                 //Wenn noch kein Eintrag für das Item vorhanden ist, füge es neu hinzu
@@ -128,18 +116,22 @@
                   var oldContent = itemText + parseInt(inputAmount,10);
                   var newContent = itemText + amount;
                   
-                  //Ersetzen des vorhanden Eintrags, damit die Anzahl aktuell ist
-                  fs.readFile('List.txt', 'utf8', function (err,data) {
-                    if (err) {
-                      return console.log(err);
-                    }
-                    var result = data.replace(oldContent, newContent);
-
-                    fs.writeFile('List.txt', result, 'utf8', function (err) {
-                      if (err) return console.log(err);
-                    });
-                  });
+                  updateEntry(oldContent, newContent);
                 }
+            }
+
+            function updateEntry(oldContent, newContent){
+              //Ersetzen des vorhanden Eintrags, damit die Anzahl aktuell ist
+              fs.readFile('List.txt', 'utf8', function (err,data) {
+                if (err) {
+                  return console.log(err);
+                }
+                var result = data.replace(oldContent, newContent);
+
+                fs.writeFile('List.txt', result, 'utf8', function (err) {
+                  if (err) return console.log(err);
+                });
+              });
             }
         </script>
     </body>
