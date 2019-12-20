@@ -2,7 +2,6 @@ const electron = require('electron');
 const {ipcRenderer} = electron;
 const fs = require('fs');
 const fsasync = fs.promises;
-const readline = require('readline');
 
 const ul = document.querySelector('ul');
 
@@ -113,7 +112,7 @@ function updateEntry(oldContent, newContent){
       return console.log(err);
     }
     var result = data.replace(oldContent, newContent);
-
+    
     fs.writeFile('List.txt', result, 'utf8', function (err) {
       if (err) return console.log(err);
     });
