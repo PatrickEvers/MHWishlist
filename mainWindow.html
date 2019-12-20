@@ -18,7 +18,8 @@
             const {ipcRenderer} = electron;
             const fs = require('fs');
             const fsasync = fs.promises;
-
+            const readline = require('readline');
+            
             const ul = document.querySelector('ul');
             ul.className = 'collection';
 
@@ -59,9 +60,16 @@
                 deleteBtn.addEventListener('click', () => {
                   var fileContent = fs.readFileSync('List.txt').toString();
                   var line = document.getElementById(li.id).textContent.replace('Delete','') + input.value;
-
-                  fileContent = fileContent.replace('\n'+line,'');
-                  fsasync.writeFile('List.txt',fileContent,'utf8');
+                  
+                  /*var listLength = document.getElementById('main-list').getElementsByTagName('li').length;
+                  if(listLength == 1){
+                    fsasync.writeFile('List.txt','','utf8');
+                  }
+                  else{*/
+                    fileContent = fileContent.replace('\n','');
+                    fileContent = fileContent.replace(line,'');
+                    fsasync.writeFile('List.txt',fileContent,'utf8');
+                  //}
 
                   deleteBtn.parentElement.remove();
                   if(ul.children.length == 0){
