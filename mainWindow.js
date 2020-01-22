@@ -2,27 +2,41 @@ const electron = require('electron');
 const {ipcRenderer} = electron;
 const fs = require('fs');
 const fsasync = fs.promises;
+var request = require("request");
 
 const ul = document.querySelector('ul');
 
-var appStart = true;
+//Lade Items aus der Datenbank in die Liste
+var options = {
+  method: 'GET',
+  url: 'http://localhost:3000/item',
+  headers: {'content-type': 'application/json'}
+};
 
-//Schreibe Inhalt der Textdatei in die Liste.
-var list = fs.readFileSync('List.txt', 'utf8').toString().split('\n');
-for(var i = 0; i < list.length; i++){
-  if(list[i] != ""){
-    if(ul.className = ""){
-      ul.className = 'collection';
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+  
+    if(body != '[]'){
+      var list = body.split('},{');
+      
+      for(var i = 0; i < list.length; i++){
+        if(list[i] != ""){
+          if(ul.className = ""){
+            ul.className = 'collection';
+          }
+          var name = list[i].substring(list[i].indexOf('"name":'),list[i].lastIndexOf('","amount":')).replace('"name":"','');
+          var amount = list[i].substring(list[i].indexOf('"amount":'),list[i].lastIndexOf('","__v":')).replace('"amount":"','');
+          addItemToList(name.replace('\r',''),amount.replace('\r',''),true);
+      
+        }
+      }
     }
-    addItemToList(list[i].substring(0,list[i].lastIndexOf(' x')),list[i].substring(list[i].lastIndexOf(' x')+2), appStart);
-  }
-}
-appStart = false;
+});
 
 //Funktion zum Empfangen der Daten aus dem addWindow
 //Erstellt neues li mit Inhalt aus dem Formular
 ipcRenderer.on('item:add', (e, item, amount) => {
-  addItemToList(item[0],item[1], appStart);
+  addItemToList(item[0].replace('\r',''),item[1].replace('\r',''), false);
 });
 
 ipcRenderer.on('item:clear', () => {
@@ -43,12 +57,18 @@ function addItemToList(itemName,itemAmount,appStart){
     deleteBtn.textContent = 'Delete';
     deleteBtn.id = 'DeleteBtn';
     deleteBtn.addEventListener('click', () => {
-      var fileContent = fs.readFileSync('List.txt').toString();
-      var line = document.getElementById(li.id).textContent.replace('Delete','') + input.value;
+      var options = {
+        method: 'DELETE',
+        url: 'http://localhost:3000/item',
+        qs: {name: `${deleteBtn.parentElement.id}`},
+        headers: {'content-type': 'application/json'}
+      };
+      console.log(deleteBtn.parentElement.id)
+      request(options, function (error, response, body) {
+        if (error) throw new Error(error);
       
-      fileContent = fileContent.replace('\n','');
-      fileContent = fileContent.replace(line,'');
-      fsasync.writeFile('List.txt',fileContent,'utf8');
+        console.log(body);
+      });
 
       deleteBtn.parentElement.remove();
       if(ul.children.length == 0){
@@ -58,16 +78,13 @@ function addItemToList(itemName,itemAmount,appStart){
 
     input.type = 'number';
     input.id = itemName + 'Amount';
-    input.addEventListener('focus', () =>{
-      input.oldvalue = input.value;
-    })
+
     input.addEventListener('change', () =>{
       var timeout = null;
       clearTimeout(timeout);
       timeout = setTimeout(function () {
-        var oldContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.oldvalue;
-        var newContent = document.getElementById(input.id.replace('Amount','')).textContent.replace('Delete','') + input.value;
-        updateEntry(oldContent,newContent);
+        var itemName = document.getElementById(input.id.replace('Amount','')).textContent.replace(' xDelete','');
+        updateEntry(itemName,input.value);
       },750);
     })
     
@@ -81,9 +98,8 @@ function addItemToList(itemName,itemAmount,appStart){
       ul.appendChild(li);
       
       if(appStart == false){
-      //Speichern des neuen Eintrags in die Datei.
-      var content = itemName + ' x' + itemAmount + '\n';
-      fsasync.appendFile('List.txt',content,'UTF8');
+      //Speichern des neuen Eintrags in die Datenbank.
+        saveEntry(itemName, itemAmount);
       }
     }
     //Wenn ein Eintrag vorhanden ist aktualisiere die Anzahl des benötigten Items
@@ -98,23 +114,41 @@ function addItemToList(itemName,itemAmount,appStart){
       document.getElementById(li.id).appendChild(input);
       document.getElementById(li.id).appendChild(deleteBtn);
 
-      var oldContent = itemText + parseInt(inputAmount,10);
-      var newContent = itemText + amount;
-      
-      updateEntry(oldContent, newContent);
+      updateEntry(itemName, amount);
     }
 }
 
-function updateEntry(oldContent, newContent){
-  //Ersetzen des vorhanden Eintrags, damit die Anzahl aktuell ist
-  fs.readFile('List.txt', 'utf8', function (err,data) {
-    if (err) {
-      return console.log(err);
-    }
-    var result = data.replace(oldContent, newContent);
-    
-    fs.writeFile('List.txt', result, 'utf8', function (err) {
-      if (err) return console.log(err);
-    });
+//Update des Datenbankeintrags
+function updateEntry(itemName, itemAmount){
+  var options = {
+    method: 'PUT',
+    url: 'http://localhost:3000/item',
+    qs: {name: `${itemName}`},
+    headers: {'content-type': 'application/json'},
+    body: {name: `${itemName}`, amount: `${itemAmount}`},
+    json: true
+  };
+  
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+  
+    console.log(body);
+  });
+}
+
+//Speichern eines neuen Items in der Datenbank
+function saveEntry(itemName, itemAmount){
+  var options = {
+    method: 'POST',
+    url: 'http://localhost:3000/item',
+    headers: {'content-type': 'application/json'},
+    body: {name: `${itemName}`, amount: `${itemAmount}`},
+    json: true
+  };
+
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+
+    console.log(body);
   });
 }

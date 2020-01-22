@@ -48,7 +48,7 @@ function createAddWindow(){
     addWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'addWindow.html'),
         protocol: 'file:',
-        slahes:true
+        slashes:true
     }));
 
     addWindow.on('close', () => {
