@@ -9,7 +9,7 @@ const ul = document.querySelector('ul');
 //Lade Items aus der Datenbank in die Liste
 var options = {
   method: 'GET',
-  url: 'http://localhost:3000/item',
+  url: 'https://mhwishlist-rest.patrickevers.now.sh/item',
   headers: {'content-type': 'application/json'}
 };
 
@@ -58,7 +58,7 @@ function addItemToList(itemName,itemAmount,appStart){
     deleteBtn.addEventListener('click', () => {
       var options = {
         method: 'DELETE',
-        url: 'http://localhost:3000/item',
+        url: 'https://mhwishlist-rest.patrickevers.now.sh/item',
         qs: {name: `${deleteBtn.parentElement.id}`},
         headers: {'content-type': 'application/json'}
       };
@@ -121,7 +121,7 @@ function addItemToList(itemName,itemAmount,appStart){
 function updateEntry(itemName, itemAmount){
   var options = {
     method: 'PUT',
-    url: 'http://localhost:3000/item',
+    url: 'https://mhwishlist-rest.patrickevers.now.sh/item',
     qs: {name: `${itemName}`},
     headers: {'content-type': 'application/json'},
     body: {name: `${itemName}`, amount: `${itemAmount}`},
@@ -139,7 +139,7 @@ function updateEntry(itemName, itemAmount){
 function saveEntry(itemName, itemAmount){
   var options = {
     method: 'POST',
-    url: 'http://localhost:3000/item',
+    url: 'https://mhwishlist-rest.patrickevers.now.sh/item',
     headers: {'content-type': 'application/json'},
     body: {name: `${itemName}`, amount: `${itemAmount}`},
     json: true
