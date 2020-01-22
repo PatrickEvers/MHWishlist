@@ -17,17 +17,16 @@ request(options, function (error, response, body) {
   if (error) throw new Error(error);
   
     if(body != '[]'){
-      var list = body.split('},{');
-      
+      var list = JSON.parse(body);
+
       for(var i = 0; i < list.length; i++){
         if(list[i] != ""){
           if(ul.className = ""){
             ul.className = 'collection';
           }
-          var name = list[i].substring(list[i].indexOf('"name":'),list[i].lastIndexOf('","amount":')).replace('"name":"','');
-          var amount = list[i].substring(list[i].indexOf('"amount":'),list[i].lastIndexOf('","__v":')).replace('"amount":"','');
-          addItemToList(name.replace('\r',''),amount.replace('\r',''),true);
-      
+          var itemName = list[i].name;
+          var itemAmount = list[i].amount;
+          addItemToList(itemName.replace('\r',''),itemAmount.replace('\r',''),true);
         }
       }
     }
