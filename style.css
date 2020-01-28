@@ -8,6 +8,16 @@
     background-color: crimson;
 }
 
+#login{
+    text-align: center;
+    margin:0 300px;
+    display:block;
+}
+
+ul{
+    display:none;
+}
+
 li{
     display:flex;
     align-items: center;
