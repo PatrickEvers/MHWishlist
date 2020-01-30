@@ -1,30 +1,40 @@
 const electron = require('electron');
+const url = require('url');
+const path = require('path');
 const {ipcRenderer} = electron;
+const BrowserWindow = electron.remote.BrowserWindow;
 const fs = require('fs');
 const fsasync = fs.promises;
 var request = require("request");
 
+var email = "";
+var URL = 'https://mhwishlist-rest.patrickevers.now.sh/item';
+//var URL = 'http://localhost:3000/item';
+const ul = document.querySelector('ul');
 
 document.getElementById('loginBtn').addEventListener('click', () =>{
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('main-list').style.display = 'block';
+  email = document.getElementById('email').value;
+  
+  var options = {method: 'GET', url: 'https://mhwishlist-rest.patrickevers.now.sh/userexists', qs: {email: `${email}`}};
 
-  var userName = document.getElementById('user-name').value;
-  var URL = 'https://mhwishlist-rest.patrickevers.now.sh/item';
-  createUser();
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
 
-  const ul = document.querySelector('ul');
+    if(body == 'true'){        
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('main-list').style.display = 'block';
+        document.getElementById('ErrorMsg').textContent = "";
 
-  //Lade Items aus der Datenbank in die Liste
-  var options = {
-        method: 'GET',
-        url: `${URL}`,
-        qs: {username: `${userName}`},
-        headers: {'content-type': 'application/json'}
-      };
+        //Lade Items aus der Datenbank in die Liste
+        var options = {
+          method: 'GET',
+          url: `${URL}`,
+          qs: {email: `${email}`},
+          headers: {'content-type': 'application/json'}
+        };
 
-      request(options, function (error, response, body) {
-        if (error) throw new Error(error);
+        request(options, function (error, response, body) {
+          if (error) throw new Error(error);
             var bodyJSON = JSON.parse(body);
             var list = bodyJSON.items;
 
@@ -38,9 +48,15 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
                 addItemToList(itemName.replace('\r',''),itemAmount.replace('\r',''),true);
               }
             }
-      });
+        });
+    }
+    else{
+      document.getElementById('ErrorMsg').textContent = "User not found!";
+    }
+  });
+})
 
-  //Funktion zum Empfangen der Daten aus dem addWindow
+ //Funktion zum Empfangen der Daten aus dem addWindow
   //Erstellt neues li mit Inhalt aus dem Formular
   ipcRenderer.on('item:add', (e, item, amount) => {
     addItemToList(item[0].replace('\r',''),item[1].replace('\r',''), false);
@@ -120,7 +136,7 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
     var options = {
       method: 'GET',
       url: `${URL}`,
-      qs: {username: `${userName}`},
+      qs: {email: `${email}`},
       headers: {'content-type': 'application/json'}
     };
 
@@ -158,10 +174,10 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
     var options = {
       method: 'PUT',
       url: `${URL}`,
-      qs: {username: `${userName}`},
+      qs: {email: `${email}`},
       headers: {'content-type': 'application/json'},
       body: {
-        username: `${userName}`,
+        email: `${email}`,
         items: itemList
       },
       json: true
@@ -177,7 +193,7 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
       method: 'POST',
       url: `${URL}`,
       headers: {'content-type': 'application/json'},
-      body: {username: `${userName}`, items: []},
+      body: {email: `${email}`, items: []},
       json: true
     };
     
@@ -185,4 +201,27 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
       if (error) throw new Error(error);
     });
   }
+
+document.getElementById('registerBtn').addEventListener('click', () =>{
+    let registerWindow;
+
+    registerWindow = new BrowserWindow({
+        width: 300,
+        heigth: 200,
+        title: 'Sign Up',
+        resizable:false,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    })
+
+    registerWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'registerWindow.html'),
+        protocol: 'file:',
+        slashes:true
+    }));
+
+    registerWindow.on('close', () => {
+        addWindow = null;
+    });
 })

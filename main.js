@@ -38,7 +38,7 @@ function createAddWindow(){
     addWindow = new BrowserWindow({
         width: 300,
         heigth: 200,
-        title: 'Add Shopping List Item',
+        title: 'Add Item',
         resizable:false,
         webPreferences: {
             nodeIntegration: true

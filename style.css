@@ -10,8 +10,17 @@
 
 #login{
     text-align: center;
-    margin:0 300px;
+    margin:0 275px;
     display:block;
+}
+
+#login #buttons{
+    display:flex;
+    justify-content: space-between;
+}
+
+#login #ErrorMsg{
+    color: red;
 }
 
 ul{
