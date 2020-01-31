@@ -3,8 +3,6 @@ const url = require('url');
 const path = require('path');
 const {ipcRenderer} = electron;
 const BrowserWindow = electron.remote.BrowserWindow;
-const fs = require('fs');
-const fsasync = fs.promises;
 var request = require("request");
 
 var email = "";
