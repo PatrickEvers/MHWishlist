@@ -186,20 +186,6 @@ document.getElementById('loginBtn').addEventListener('click', () =>{
     });
   }
 
-  function createUser(){
-    var options = {
-      method: 'POST',
-      url: `${URL}`,
-      headers: {'content-type': 'application/json'},
-      body: {email: `${email}`, items: []},
-      json: true
-    };
-    
-    request(options, function (error, response, body) {
-      if (error) throw new Error(error);
-    });
-  }
-
 document.getElementById('registerBtn').addEventListener('click', () =>{
     let registerWindow;
 
